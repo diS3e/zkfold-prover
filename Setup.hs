@@ -51,15 +51,17 @@ rsAddDirs lbi' = do
     dir <- getCurrentDirectory
     let rustIncludeDir = dir </> rsFolder
         rustLibDir = dir </> rsFolder </> "target/release"
+    -- print dir
+    throwIO $ userError $ "Dir: " ++ show dir
+    (includeRustDir, extraLibDir) <- 
+      case findIndex (isPrefixOf "dist-newstyle") (tails dir) of
+        Just ind -> do
+          let pathToDistNewstyle = take ind dir
+              pathToRustLib = pathToDistNewstyle ++ "dist-newstyle"
+          copyFile (rustLibDir </> libName) (pathToRustLib </> libName)
 
-    (includeRustDir, extraLibDir) <- case findIndex (isPrefixOf "dist-newstyle") (tails dir) of
-      Just ind -> do
-        let pathToDistNewstyle = take ind dir
-            pathToRustLib = pathToDistNewstyle ++ "dist-newstyle"
-        copyFile (rustLibDir </> libName) (pathToRustLib </> libName)
-
-        return (pathToRustLib, pathToRustLib)
-      Nothing -> return (rustLibDir, rustLibDir)
+          return (pathToRustLib, pathToRustLib)
+        Nothing -> return (rustLibDir, rustLibDir)
 
     let updateLbi lbi = lbi{localPkgDescr = updatePkgDescr (localPkgDescr lbi)}
         updatePkgDescr pkgDescr = pkgDescr{library = updateLib <$> library pkgDescr}
