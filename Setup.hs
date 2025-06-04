@@ -75,6 +75,6 @@ rsAddDirs lbi' = do
             { includeDirs = unsafeMakeSymbolicPath includeRustDir : includeDirs libBuild
             , extraLibDirs = unsafeMakeSymbolicPath extraLibDir : extraLibDirs libBuild
             }
-    throwIO $ userError $ "Dir: " ++ show dir
+    -- throwIO $ userError $ "Dir: " ++ show dir
 
     pure $ updateLbi lbi'
